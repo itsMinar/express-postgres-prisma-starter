@@ -1,18 +1,11 @@
-const { z } = require('zod');
+const todoSchema = require('../../schemas/todoSchema.js');
 const { asyncHandler } = require('../../../utils/asyncHandler.js');
 const CustomError = require('../../../utils/Error.js');
 const addTodoService = require('../../services/todo/addTodoService.js');
 const { ApiResponse } = require('../../../utils/ApiResponse.js');
 
 const addTodo = asyncHandler(async (req, res, next) => {
-  const schema = z.object({
-    title: z
-      .string({ message: 'Title is required' })
-      .min(2, 'Title must be at least 2 characters'),
-    isComplete: z.boolean().optional(),
-  });
-
-  const validation = schema.safeParse(req.body);
+  const validation = todoSchema.safeParse(req.body);
 
   if (!validation.success) {
     const error = CustomError.badRequest({

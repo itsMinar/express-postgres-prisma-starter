@@ -1,3 +1,4 @@
+const todoSchema = require('../../schemas/todoSchema.js');
 const { z } = require('zod');
 const { asyncHandler } = require('../../../utils/asyncHandler.js');
 const CustomError = require('../../../utils/Error.js');
@@ -7,16 +8,13 @@ const { ApiResponse } = require('../../../utils/ApiResponse.js');
 const updateTodoById = asyncHandler(async (req, res, next) => {
   const { todoId } = req.params;
 
-  const schema = z.object({
-    id: z.string({ message: 'Todo ID is Required' }),
-    title: z
-      .string({ message: 'Title is required' })
-      .min(2, 'Title must be at least 2 characters')
-      .optional(),
-    isComplete: z
-      .boolean({ message: 'isComplete must be a Boolean Value' })
-      .optional(),
-  });
+  const schema = todoSchema
+    .extend({
+      id: z
+        .string({ message: 'Todo ID is Required' })
+        .cuid({ message: 'Invalid ID format' }),
+    })
+    .partial();
 
   const validation = schema.safeParse({ id: todoId, ...req.body });
 
