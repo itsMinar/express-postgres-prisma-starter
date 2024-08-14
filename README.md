@@ -9,13 +9,13 @@ To Use this Starter Template locally, follow these steps:
 1. Clone the project repository:
 
    ```bash
-   git clone https://github.com/itsMinar/express-postgres-prisma.git
+   git clone https://github.com/itsMinar/express-postgres-prisma-starter.git
    ```
 
 2. Navigate to the project directory.
 
    ```bash
-   cd express-postgres-prisma
+   cd express-postgres-prisma-starter
    ```
 
 3. Remove the git initialization (.git) file (don't use powershell) -
@@ -39,4 +39,4 @@ To Use this Starter Template locally, follow these steps:
 
 7. Access the APIs at the specified endpoints.
 
-## In the root directory the `vercel.json` file is for Free Deployment on Vercel
+## In the root directory the `vercel.json` file is for Free Deployment on Vercel. You can `delete` it if you don't want to deploy on Vercel.

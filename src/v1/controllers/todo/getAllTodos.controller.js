@@ -1,15 +1,14 @@
 const { asyncHandler } = require('../../../utils/asyncHandler.js');
+const getAllTodosService = require('../../services/todo/getAllTodosService.js');
 const { ApiResponse } = require('../../../utils/ApiResponse.js');
-const prisma = require('../../../utils/prisma.js');
 
-const getAllTodos = asyncHandler(async (req, res) => {
-  // find all todos in DB
-  const todos = await prisma.todo.findMany();
+const getAllTodos = asyncHandler(async (req, res, next) => {
+  const todos = await getAllTodosService();
 
   // return response
   return res
     .status(200)
-    .json(new ApiResponse(200, todos, 'Get All Todos Successfully'));
+    .json(new ApiResponse(200, todos, 'All Todos  fetched Successfully'));
 });
 
 module.exports = getAllTodos;

@@ -1,32 +1,48 @@
+const { z } = require('zod');
 const { asyncHandler } = require('../../../utils/asyncHandler.js');
+const CustomError = require('../../../utils/Error.js');
+const addTodoService = require('../../services/todo/addTodoService.js');
 const { ApiResponse } = require('../../../utils/ApiResponse.js');
-const { ApiError } = require('../../../utils/ApiError.js');
-const prisma = require('../../../utils/prisma.js');
 
-const addTodo = asyncHandler(async (req, res) => {
-  // get todo details from client
-  const { title } = req.body;
+const addTodo = asyncHandler(async (req, res, next) => {
+  const schema = z.object({
+    title: z
+      .string({ message: 'Title is required' })
+      .min(2, 'Title must be at least 2 characters'),
+    isComplete: z.boolean().optional(),
+  });
 
-  // validation
-  if (!title) {
-    throw new ApiError(400, 'Title is Required!');
+  const validation = schema.safeParse(req.body);
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
   }
 
-  // create new todo and entry in DB
-  const todo = await prisma.todo.create({ data: { title } });
-
-  // check that new todo has been added into the DB
-  const createdTodo = await prisma.todo.findUnique({ where: { id: todo.id } });
-
-  // check for todo creation
-  if (!createdTodo) {
-    throw new ApiError(500, 'Something went wrong while adding new todo');
-  }
+  // add new todo
+  const todo = await addTodoService(validation.data);
 
   // return response
-  return res
-    .status(201)
-    .json(new ApiResponse(201, createdTodo, 'Todo Added Successfully'));
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      {
+        ...todo,
+        links: {
+          self: '/todos',
+          get: `/todos/${todo.id}`,
+          update: `/todos/${todo.id}`,
+          delete: `/todos/${todo.id}`,
+        },
+      },
+      'Todo Added Successfully'
+    )
+  );
 });
 
 module.exports = addTodo;
